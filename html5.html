@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv='X-UA-Compatible' content='IE=edge' />
+		<title>Transformed Result Set</title>
+
+		<!-- Load UI5, select gold reflection theme and the "commons" and "table" control libraries -->
+		<script id='sap-ui-bootstrap' type='text/javascript'
+		   src='https://sapui5.netweaver.ondemand.com/resources/sap-ui-core.js'
+		   data-sap-ui-theme='sap_goldreflection'
+		   data-sap-ui-libs='sap.ui.commons,sap.ui.table'></script>
+
+		<script type="text/javascript" src="entireResultset.js"></script>
+		<script type="text/javascript" src="formatTransform.js"></script>
+		<script>
+			reformatIntoSimpleTuples(resultSetJSON, 'text');
+			
+			// create the DataTable control
+			oTable = new sap.ui.table.Table({editable:true});
+
+			
+			//The UI5 table consumes a javascript object of a different format than resultSetJSON; 
+			//	one with a broadly similar pattern to the newly created simple tuples
+			
+			// define the Table columns
+			for (var i = 0; i < headerTuple.length; i++) {
+				var colID = "{RESULT/COL" + i.toString() + "}";
+				var oControl = new sap.ui.commons.TextView({text:colID}); // short binding notation
+				oTable.addColumn(new sap.ui.table.Column({label: new sap.ui.commons.Label({text: headerTuple[i]}), template: oControl }));
+			}
+			
+			var resultJSONList = [];
+			for (var i = 0; i < rowTuples.length; i++) {
+				var resultObject = new Object();
+				for (var j = 0; j < rowTuples[i].length; j++) {
+					var colKey = "COL" + j.toString();
+					resultObject[colKey] = rowTuples[i][j];
+				}
+				var resultObjectOuter = new Object();
+				resultObjectOuter["RESULT"] = resultObject;
+				resultJSONList.push(resultObjectOuter);
+			}
+
+			var allResultObject = new Object();
+			allResultObject["RESULTS"] = resultJSONList;
+
+			// create a JSONModel, fill in the data and bind the Table to this model
+			var oModel = new sap.ui.model.json.JSONModel();
+			oModel.setData(allResultObject);
+			oTable.setModel(oModel);
+			oTable.bindRows("/RESULTS");
+
+			// finally place the Table into the UI
+			oTable.placeAt("content");
+
+	   </script>
+   
+    </head>
+	<body class='sapUiBody'>
+		<div id='content'></div>
+	</body>
+</html>
