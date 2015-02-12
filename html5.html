@@ -3,18 +3,19 @@
 	<head>
 		<meta http-equiv='X-UA-Compatible' content='IE=edge' />
 		<title>Transformed Result Set</title>
-
+		
 		<!-- Load UI5, select gold reflection theme and the "commons" and "table" control libraries -->
 		<script id='sap-ui-bootstrap' type='text/javascript'
 		   src='https://sapui5.netweaver.ondemand.com/resources/sap-ui-core.js'
 		   data-sap-ui-theme='sap_goldreflection'
 		   data-sap-ui-libs='sap.ui.commons,sap.ui.table'></script>
 
-		<script type="text/javascript" src="entireResultset.js"></script>
+		<!--<script type="text/javascript" src="entireResultset.js"></script>-->
+		<script type="text/javascript" src="multiDimensionResultset.js"></script>
 		<script type="text/javascript" src="formatTransform.js"></script>
 		<script>
 			reformatIntoSimpleTuples(resultSetJSON, 'text');
-			
+						
 			// create the DataTable control
 			oTable = new sap.ui.table.Table({editable:true});
 
@@ -25,7 +26,7 @@
 			// define the Table columns
 			for (var i = 0; i < headerTuple.length; i++) {
 				var colID = "{RESULT/COL" + i.toString() + "}";
-				var oControl = new sap.ui.commons.TextView({text:colID}); // short binding notation
+					var oControl = new sap.ui.commons.TextView({text:colID}); // short binding notation
 				oTable.addColumn(new sap.ui.table.Column({label: new sap.ui.commons.Label({text: headerTuple[i]}), template: oControl }));
 			}
 			
@@ -51,10 +52,26 @@
 			oTable.bindRows("/RESULTS");
 
 			// finally place the Table into the UI
-			oTable.placeAt("content");
-
+     		oTable.placeAt("content");
 	   </script>
-   
+ 		<script>
+			jQuery.sap.includeStyleSheet("postStyle.css";
+		</script> 
+		<script>
+			$( document ).ready(function() {
+				var rows = oTable.getRows();
+				for (var k = 0; k < rows.length; k++) {
+					var cells = rows[k].getCells();
+					for (var l = 0; l < cells.length; l++) {
+						try{
+							var currCell = cells[l]
+							currCell.toggleStyleClass(repeatMask[k][l]); 
+						}
+						catch(exc){} 
+					}
+				}
+			});
+		</script>
     </head>
 	<body class='sapUiBody'>
 		<div id='content'></div>
